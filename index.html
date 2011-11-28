@@ -1,75 +1,546 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset='utf-8'>
 
-  <title>loshia/days @ GitHub</title>
+<title>Day Of The Week - The Game</title>
 
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #ffffff;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #000000; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #000000; }
-    h3 { text-align: center; color: #000000; }
-    a { color: #000000; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+<script src="jquery.mousewheel.js" type="text/javascript"></script>
+<!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.css" />
+<script src="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.js"></script>-->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="#FFDEAD" />
+
+<script type="text/javascript">
+
+var mdays = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+var mnames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+var mcodes = new Array(6, 2, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4);
+var day, month, year, leap, mday;
+var centurycode, yearcode, monthcode, daycode, leapadj;
+var flyingout = 0;
+
+var firefox = navigator.userAgent.toLowerCase().indexOf("firefox/");
+var chrome = navigator.userAgent.toLowerCase().indexOf("chrome/");
+var browserok = firefox > 0 || chrome > 0 || navigator.userAgent.toLowerCase().indexOf("webkit") > 0;
+
+function randomday()
+{
+	year = (Math.floor(Math.random()*3) + 18) * 100 + Math.floor(Math.random()*100);
+	month = Math.floor(Math.random()*12);
+	day = Math.floor(Math.random()*mdays[month])+1;
+	setdate(day, month, year);
+}
+
+function setdate(d, m, y, calc)
+{
+	year = y; month = m; day = d;
+	
+	if (year < 1800) year = 1800;
+	else if (year > 2099) year = 2099;
+	
+	if (month < 0) month = 0;
+	else if (month > 11) month = 11;
+		
+	leap = year % 4 == 0 && year != 1800 && year != 1900;
+	mday = mdays[month];
+	
+	if (day < 1) day = 1;
+	else if (day > mday) day = mday;
+	
+	$("#day").html(day);
+	$("#month").html(mnames[month]);
+	$("#year").html(year);
+	
+	if (calc)
+	{
+		answer = calcday();
+		$('.dow').removeClass("correct");
+		$('.dow[day="'+answer+'"]').addClass("correct");
+		$(".next").addClass("shownext");
+	}
+}
+
+function calcday()
+{
+	centurycode = 0;
+	if (year >= 1900 && year < 2000)
+		centurycode = 1;
+	else if (year >= 1800 && year < 1900)
+		centurycode = 3;
+		
+	yearcode = (year % 100) % 28;
+	if (yearcode >= 24)
+		yearcode = 2 + yearcode - 24;
+	else if (yearcode >= 20)
+		yearcode = 4 + yearcode - 20;
+	else if (yearcode >= 16)
+		yearcode = 6 + yearcode - 16;
+	else if (yearcode >= 12)
+		yearcode = 1 + yearcode - 12;
+	else if (yearcode >= 8)
+		yearcode = 3 + yearcode - 8;
+	else if (yearcode >= 4)
+		yearcode = 5 + yearcode - 4;
+	else
+		yearcode = 0 + yearcode - 0;
+		
+	monthcode = mcodes[month];
+	
+	daycode = day % 7;
+	
+	if (leap && month < 2)
+		leapadj = -1;
+	else
+		leapadj = 0;
+	
+	return (centurycode + yearcode + monthcode + daycode + leapadj) % 7;
+}
+
+function change(elem)
+{
+	$("#"+elem).addClass("offscreen");
+	setTimeout(function(){ 
+		$("#"+elem).removeClass("offscreen"); 
+		flyingout=0; 
+		}, 1200 );
+}
+
+function settoday()
+{
+	setdate((new Date()).getDate(), (new Date()).getMonth(), (new Date()).getFullYear(), true);
+}
+
+function flyout(callback)
+{
+	if (flyingout)
+		return;
+	flyingout = 1;
+	if (!browserok)
+	{
+		$("#day").html("--"); $("#month").html("--"); $("#year").html("----");
+	} 
+	$(".dow").addClass("disabled");
+	setTimeout(function(){ change("day"); }, Math.floor(Math.random()*250));
+	setTimeout(function(){ change("month"); }, Math.floor(Math.random()*250));
+	setTimeout(function(){ change("year"); }, Math.floor(Math.random()*250));
+	setTimeout(function(){ change("comma"); }, Math.floor(Math.random()*250));
+	
+	setTimeout(function() { $(".next").removeClass("shownext"); }, 500);
+	setTimeout(function() { 
+		$(".dow").removeClass("disabled"); 
+		$(".next").removeClass("hidenext");
+		callback(); }, 600);
+}
+
+function dayclicked(dow)
+{
+	if (flyingout)
+		return;
+	answer = $(dow).attr("day");
+	correctanswer = calcday();
+	$('.dow[day="'+correctanswer+'"]').removeClass("correct2").addClass("correct");
+	$('.dow').removeClass("wrong");
+	if (correctanswer == answer)
+		$("#result").html("Correct");
+	else
+	{
+		$("#result").html("Wrong");
+		$('.dow[day="'+answer+'"]').addClass("wrong");
+	}
+	$(".next").addClass("shownext");
+}
+
+$(document).ready(function() {
+	setTimeout(function(){flyout(randomday);}, 500);
+	
+	$(".dow").click(function(event){
+		dayclicked(event.target);
+	});
+	
+	$(".next").click(function(event){
+		$('.dow').removeClass("wrong").removeClass("correct").removeClass("correct2");
+		$(".next").addClass("hidenext");
+		flyout(randomday);
+	});
+	
+	$("#day").mousewheel(function(event, delta){
+		day = day + Math.floor(delta);
+		setdate(day, month, year, true);
+	});
+	$("#day").click(function(event){
+		flyout(settoday);
+	});
+	
+	$("#month").mousewheel(function(event, delta){
+		month = month + Math.floor(delta);
+		setdate(day, month, year, true);
+	});
+	$("#month").click(function(event){
+		flyout(settoday);
+	});
+
+	$("#year").mousewheel(function(event, delta){
+		year = year + Math.floor(delta);
+		setdate(day, month, year, true);
+	});
+	$("#year").click(function(event){
+		flyout(settoday);
+	});
+	
+	$("#about").click(function(){
+		window.scrollTo(0, 1);
+		$(".help").css("display", "block");
+		setTimeout(function(){$(".help").addClass("helpvis");}, 100);
+	});
+	
+	$(".help").click(function(){
+		$(".help").removeClass("helpvis");
+		setTimeout(function(){$(".help").css("display", "none");}, 500);
+	});
+	
+	$(document).keypress(function(event){
+		if (event.which == 32)
+			$(".next").click();
+		else if (event.which >= 48 && event.which <=54)
+			dayclicked($('.dow[day="'+(event.which-48)+'"]'));
+	});
+	
+	$("#feedback a").attr("href", "mailto:l"+"o"+"s"+"h"+"i"+"a"+"@"+"g"+"m"+"a"+"i"+"l"+".com");
+	
+	setTimeout(function(){ window.scrollTo(0, 1); }, 100);
+});
+
+</script>
+
+<style>
+
+body, .ui-page-active, .ui-body-c {
+	background: Cornsilk;
+	filter: none;
+	overflow: hidden;
+}
+
+#content {
+	height: 500px;
+}
+
+.button {
+	-moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; 
+	cursor: pointer;
+	width: 150px;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	margin: auto;
+	font-family: Arial;
+}
+@media screen and (min-width: 800px) and (min-height: 640px) {
+	.button {
+		width: 250px; height: 50px; line-height: 50px;
+		-moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px;
+		text-shadow: grey 2px 2px 4px;
+	}
+}
+
+#dow {
+	display: block;
+	margin: auto;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	height: 50px; line-height: 50px;
+	width: 320px;
+	text-align: center;
+	font-size: 3em;
+	font-family: Georgia;
+	text-shadow: grey 2px 2px 4px;
+}
+@media screen and (min-width: 800px) and (min-height: 640px) {
+	#dow {
+		width: 500px;
+		font-size: 4em;
+		height: 75px; line-height: 75px;
+		margin-top: 30px;
+	}
+}
+
+#dowc {
+	display: inline-block;
+	margin: auto;
+}
+
+.label {
+	display: none;
+}
+
+.dow {
+	-moz-transition-duration: 0.4s; -webkit-transition-duration: 0.4s; 
+	background-color: NavajoWhite;
+	color: black;
+	font-size: 1em;
+	margin-bottom: 5px;
+}
+@media screen and (min-width: 800px) and (min-height: 640px) {
+	.dow {
+		margin-bottom: 10px;
+		border: 1px solid black;
+	}
+	.label {
+		width: 20px; height: 20px; line-height: 20px; 
+		text-align: center;
+		display: block;
+		position: relative;
+		left: 10px; top: -35px;
+		background-color: Cornsilk;
+		border: 1px solid black;
+		text-shadow: none;
+		color: black;
+		font-size: 16px;
+	}
+}
+
+@media screen and (min-width: 800px) and (min-height: 640px) {
+	.disabled {
+		color: grey;
+	}
+}
+
+.correct {
+	color: white;
+	background-color: green;
+	font-size: 1.5em;
+	width: 170px;
+}
+@media screen and (min-width: 800px) and (min-height: 640px) {
+	.correct {
+		width: 300px;
+	}
+}
+@-moz-keyframes pulsatemov {
+	10% { -moz-transform: translateX(-3px);	}
+	20% { -moz-transform: translateX(+3px);	}
+	30% { -moz-transform: translateX(-3px);	}
+	40% { -moz-transform: translateX(+3px);	}
+	50% { -moz-transform: translateX(-3px);	}
+	60% { -moz-transform: translateX(+3px);	}
+	70% { -moz-transform: translateX(-3px);	}
+	80% { -moz-transform: translateX(+3px);	}
+	90% { -moz-transform: translateX(-3px);	}
+}
+@-webkit-keyframes pulsatemov {
+	10% { -webkit-transform: translateX(-3px); }
+	20% { -webkit-transform: translateX(+3px); }
+	30% { -webkit-transform: translateX(-3px); }
+	40% { -webkit-transform: translateX(+3px); }
+	50% { -webkit-transform: translateX(-3px); }
+	60% { -webkit-transform: translateX(+3px); }
+	70% { -webkit-transform: translateX(-3px); }
+	80% { -webkit-transform: translateX(+3px); }
+	90% { -webkit-transform: translateX(-3px); }
+}
+
+.correct2 {
+	color: white;
+	background-color: green;
+	font-size: 1em;
+}
+
+.wrong {
+	-moz-animation: pulsatemov 0.4s; -webkit-animation: pulsatemov 0.4s; 
+	color: red;
+}
+
+.next1 {
+	-moz-transition-duration: 0.4s; -webkit-transition-duration: 0.4s; 
+	color: Cornsilk;
+	margin-top: 20px;
+	text-shadow: none;
+}
+.next1 .label { display: none }
+.shownext1 {
+	color: white;
+	background-color: DodgerBlue;
+}
+.shownext1 .label { display: block }
+
+.next {
+	margin-top: 20px;
+	background-color: DodgerBlue;
+	color: white;
+	-moz-transform: translateY(100px) scale(0); -webkit-transform: translateY(100px) scale(0);
+	-moz-transition-duration: 0.4s; -webkit-transition-duration: 0.4s; 
+}
+.shownext {
+	-moz-transform: translateY(0px) scale(1); -webkit-transform: translateY(0px) scale(1);
+}
+.hidenext {
+	-moz-transform: translateY(0px) scale(0); -webkit-transform: translateY(0px) scale(0);
+}
+
+#result {
+	display: none;
+}
+
+#day, #month, #year, #comma {
+	-moz-transition-duration: 0.5s; -webkit-transition-duration: 0.5s; 
+	-moz-transition-property: color; -webkit-transition-property: color; 
+	display: block;
+	float: left;
+	cursor: pointer;
+}
+
+#month { 
+	margin-right: 10px;
+}
+
+@media screen and (min-width: 800px) and (min-height: 640px) {
+	#day:hover, #month:hover, #year:hover { 
+		color: red;
+	}
+}
+
+#comma {
+	margin-right: 10px;
+}
+
+#answer {
+	clear: both;
+}
+
+@-moz-keyframes offscreen {
+	10% { -moz-transform: translateY(-120px);	}
+	70% { -moz-transform: translateY(-120px);	}
+	80% { -moz-transform: translateY(0px);	}
+	90% { -moz-transform: translateY(+10px);	}
+	100% { -moz-transform: translateY(0px);	}
+}
+@-webkit-keyframes offscreen {
+	10% { -webkit-transform: translateY(-120px);	}
+	70% { -webkit-transform: translateY(-120px);	}
+	80% { -webkit-transform: translateY(+0px);	}
+	90% { -webkit-transform: translateY(+10px);	}
+	100% { -webkit-transform: translateY(+0px);	}
+}
+.offscreen {
+	-moz-animation: offscreen 1.0s; -webkit-animation: offscreen 1.0s; 
+}
+
+#about, #feedback {
+	-moz-transition-duration: 0.5s; -webkit-transition-duration: 0.5s; 
+	-moz-transform: rotate(90deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg);
+	-moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;
+	cursor: pointer;
+	width: 80px; height: 40px; line-height: 40px;
+	text-align: center;
+	background: Cornsilk;
+	font-family: Arial;
+	position: absolute;
+	margin: 0; padding: 0;
+	top: 136px; left: -25px;
+	display: block;
+	border: 1px solid black;
+}
+#feedback {
+	top: 235px;
+}
+#feedback a { text-decoration: none; color: black; }
+@media screen and (min-width: 800px) and (min-height: 640px) {
+	#about, #feedback {
+		text-shadow: grey 1px 1px 1px;
+		top: 200px;
+	}
+	#feedback { top: 320px; }
+	#about:hover, #feedback:hover {
+		-moz-transform: rotate(90deg) scale(1.5) !important;
+		-webkit-transform: rotate(90deg) scale(1.5) !important;
+		-ms-transform: rotate(90deg) scale(1.5) !important;
+		padding-bottom: 10px !important;
+	}
+}
+
+.help {
+	-moz-transform: rotate(90deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg);
+	-moz-transition-duration: 0.4s; -webkit-transition-duration: 0.4s; -ms-transition-duration: 0.4s;
+	-moz-transform-origin: top left; -webkit-transform-origin: top left; -ms-transform-origin: top left;
+	position: absolute;
+	top: 0; left: 0;
+	background-color: white;
+	text-align: center;
+	width: 10%;
+	height: 10%;
+	display: none;
+}
+.help div {
+	width: 300px;
+	margin: auto;
+	text-align: left;
+}
+.helpvis {
+	-moz-transform: rotate(0deg); -webkit-transform: rotate(0deg); -ms-transform: rotate(0deg);
+	width: 100%;
+	height: 200%;
+}
+
+#ison {
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+</style>
+
 </head>
 
 <body>
-  <a href="http://github.com/loshia/days"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+<!--<div data-role="header">
+		<h1>Day of the Week</h1>
+	</div>--><!-- /header -->
+<div id="content">
+	<div id="dow">
+		<div id="dowc" title="Use mouse wheel to change. Click to set to today.">
+			<div id="month">--</div> <div id="day">--</div><div id="comma">,</div> <div id="year">----</div>
+		</div>
+	</div>
+	<div id="ison">	is on </div>
+	<div id="answer">
+		<div class="dow button" day="1">Monday   <div class="label">1</div></div>
+		<div class="dow button" day="2">Tuesday  <div class="label">2</div></div>
+		<div class="dow button" day="3">Wednesday<div class="label">3</div></div>
+		<div class="dow button" day="4">Thursday <div class="label">4</div></div>
+		<div class="dow button" day="5">Friday   <div class="label">5</div></div>
+		<div class="dow button" day="6">Saturday <div class="label">6</div></div>
+		<div class="dow button" day="0">Sunday   <div class="label">0</div></div>
+	</div>
+	<div id="result">
+	</div>
+	<div class="next button">Reset<div class="label">␣</div></div>
+	<div id="about">about</div>
+	<div id="feedback"><a href="#">feedback</a></div>
+</div><!-- /content -->
 
-  <div id="container">
-
-    <div class="download">
-      <a href="http://github.com/loshia/days/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/loshia/days/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-
-    <h1><a href="http://github.com/loshia/days">Day Of The Week</a>
-      <span class="small">by <a href="http://github.com/loshia">loshia</a></span></h1>
-
-    <div class="description">
-      A simple game to master how to calculate day of the week for any date.
-    </div>
-
-    <h2>Contact</h2>
-<p> (loshia@gmail.com)<br/>      </p>
-
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/loshia/days/zipball/master">zip</a> or
-      <a href="http://github.com/loshia/days/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/loshia/days</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/loshia/days">loshia/days</a>
-    </div>
-
-  </div>
-
+<div class="help">
+	<div>
+	<br/><b>Day Of The Week - The Game</b><br/><br/>
+	
+	This page is nothing but a small experiment. It all started when I read
+  <a href="http://gmmentalgym.blogspot.com/2011/03/day-of-week-for-any-date-revised.html">this page</a>
+  about how to calculate the day of the week for a given a date. <br/><br/>
   
+  I decided to build a small web app to train myself with the calculation and also to test
+	what it's like to use CSS3 animations. Very interesting and worth the several hours of work. 
+	No JavaScript or Flash are used for the animations. 
+	Only Firefox or Webkit browsers are supported (Chrome, Safari, iPhone, Android).<br/><br/>
+	
+	Clicking on the date will set it to today. Use the mouse wheel to go to different day, month or year.
+	Click the reset button to pick a random date and then try to calculate the day of the week yourself. 
+	Keyboard keys 0-6 and Space are also working.<br/><br/>
+	
+	contact: <a href="http://twitter.com/loshia">twitter</a> <br/><br/>
+	[click anywhere to close]
+	</div>
+</div>	
+
 </body>
 </html>
