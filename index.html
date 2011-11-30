@@ -1,75 +1,75 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset='utf-8'>
 
-  <title>loshia/days @ GitHub</title>
+<title>Day Of The Week - The Game</title>
 
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #ffffff;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #000000; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #000000; }
-    h3 { text-align: center; color: #000000; }
-    a { color: #000000; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+<script src="jquery.mousewheel.js" type="text/javascript"></script>
+<!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.css" />
+<script src="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.js"></script>-->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" href="screen.css" type="text/css" />
+<script src="main.js" type="text/javascript"></script>
+<meta name="viewport" content="width=device-width"/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="#FFDEAD" />
+
+<script type="text/javascript">
+</script>
+
 </head>
 
 <body>
-  <a href="http://github.com/loshia/days"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+<!--<div data-role="header">
+		<h1>Day of the Week</h1>
+	</div>--><!-- /header -->
+<div id="content">
+	<div id="dow">
+		<div id="dowc" title="Use mouse wheel to change. Click to set to today.">
+			<div id="month">--</div> <div id="day">--</div><div id="comma">,</div> <div id="year">----</div>
+		</div>
+	</div>
+	<div id="ison">	is on </div>
+	<div id="answer">
+		<div class="dow button" day="1">Monday   <div class="label">1</div></div>
+		<div class="dow button" day="2">Tuesday  <div class="label">2</div></div>
+		<div class="dow button" day="3">Wednesday<div class="label">3</div></div>
+		<div class="dow button" day="4">Thursday <div class="label">4</div></div>
+		<div class="dow button" day="5">Friday   <div class="label">5</div></div>
+		<div class="dow button" day="6">Saturday <div class="label">6</div></div>
+		<div class="dow button" day="0">Sunday   <div class="label">0</div></div>
+	</div>
+	<div id="result">
+	</div>
+	<div class="next button">Reset<div class="label">␣</div></div>
+	<div id="about">about</div>
+	<div id="feedback"><a href="#">feedback</a></div>
+</div><!-- /content -->
 
-  <div id="container">
-
-    <div class="download">
-      <a href="http://github.com/loshia/days/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/loshia/days/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-
-    <h1><a href="http://github.com/loshia/days">Day Of The Week</a>
-      <span class="small">by <a href="http://github.com/loshia">loshia</a></span></h1>
-
-    <div class="description">
-      A simple game to master how to calculate day of the week for any date.
-    </div>
-
-    <h2>Contact</h2>
-<p> (loshia@gmail.com)<br/>      </p>
-
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/loshia/days/zipball/master">zip</a> or
-      <a href="http://github.com/loshia/days/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/loshia/days</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/loshia/days">loshia/days</a>
-    </div>
-
-  </div>
-
+<div class="help">
+	<div>
+	<br/><b>Day Of The Week - The Game</b><br/><br/>
+	
+	This page is nothing but a small experiment. It all started when I read
+  <a href="http://gmmentalgym.blogspot.com/2011/03/day-of-week-for-any-date-revised.html">this page</a>
+  about how to calculate the day of the week for a given a date. <br/><br/>
   
+  I decided to build a small web app to train myself with the calculation and also to test
+	what it's like to use CSS3 animations. Very interesting and worth the several hours of work. 
+	No JavaScript or Flash are used for the animations. 
+	Only Firefox or Webkit browsers are supported (Chrome, Safari, iPhone, Android).<br/><br/>
+	
+	Clicking on the date will set it to today. Use the mouse wheel to go to different day, month or year.
+	Click the reset button to pick a random date and then try to calculate the day of the week yourself. 
+	Keyboard keys 0-6 and Space are also working.<br/><br/>
+	
+	contact: <a href="http://twitter.com/loshia">twitter</a> 
+	source:  <a href="http://loshia.github.com">github</a> <br/><br/>
+	[click anywhere to close]
+	</div>
+</div>	
+
 </body>
 </html>
